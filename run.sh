@@ -1,6 +1,9 @@
 #!/bin/bash
 
-LAUNCH_TEMPLATE=lt-02226ebae5fbef5f3
+#LAUNCH_TEMPLATE=lt-02226ebae5fbef5f3
+#LAUNCH_TEMPLATE=lt-0a6a2caec5c325268 
+#LAUNCH_TEMPLATE=lt-01e3cdbe79c78cf24
+LAUNCH_TEMPLATE=lt-06f1433dfebcdd40e
 
 function start_instances
 {
@@ -70,20 +73,13 @@ function stop_instances
 	tput sgr0
 }
 
+# before syncing payload, this would happen
 function prepare_payload
 {
-	# $1: topology file to use
-	if [ $# -ne 1 ]; then
-		tput setaf 1
-		echo "Required: topology file"
-		tput sgr0
-		exit 1
-	fi
-	echo "Deleting existing files"
-	rm -rf payload
-	mkdir -p payload
 	local instances=`cat instances.txt`
 	local instance_ids=""
+	rm -rf ./payload
+	mkdir -p payload
 	for instance in $instances ;
 	do
 		local id
@@ -91,16 +87,12 @@ function prepare_payload
 		local lan
 		IFS=',' read -r id ip lan <<< "$instance"
 		echo "Generating config files for $id"
-		python3 scripts/gen_etcd_config.py $id $lan instances.txt
-		cp scripts/bootstrap.sh payload/$id/bootstrap.sh
-		cp scripts/bootstrap-etcd.sh payload/$id/bootstrap-etcd.sh
-		cp scripts/bootstrap-sbt.sh payload/$id/bootstrap-sbt.sh
-		cp scripts/bootstrap-scorex.sh payload/$id/bootstrap-scorex.sh
-		cp scripts/start-scorex.sh payload/$id/start-scorex.sh
-		cp scripts/stop-scorex.sh payload/$id/stop-scorex.sh
-		cp scripts/get-scorex-perf.sh payload/$id/get-scorex-perf.sh
+		mkdir -p ./payload/$id
+		cp ./scripts/bootstrap.sh ./payload/$id/bootstrap.sh
+		cp -rf ./scripts/park_agents ./payload/$id/
+		# TODO: copy all the appropriate models as well
 	done
-	python3 scripts/gen_scorex_config.py instances.txt $1
+	python3 ./scripts/gen_workload.py 
 	tput setaf 2
 	echo "Payload written"
 	tput sgr0
@@ -125,6 +117,21 @@ function start_scorex_single
 function stop_scorex_single
 {
 	ssh $1 -- 'bash /home/ubuntu/payload/stop-scorex.sh &>/home/ubuntu/log/stop.log'
+}
+
+function copy_log_files_single
+{
+	# $1: host id, $2: EXP_NAME directory.
+	mkdir -p $2
+	mkdir -p $2/$1
+	scp -r $1:/home/ubuntu/log/* ./$2/$1
+}
+
+function copy_logs
+{
+	# $1: the directory name for resulting logs.
+	# FIMXE: will copy everything to same directory
+	execute_on_all copy_log_files $1
 }
 
 function execute_on_all
@@ -353,6 +360,8 @@ case "$1" in
 		query_api $2 $3 ;;
 	scp)
 		scp_from_server $2 $3 $4 ;;
+	copy-logs)
+		copy_logs $2 ;;
 	*)
 		tput setaf 1
 		echo "Unrecognized subcommand '$1'"
