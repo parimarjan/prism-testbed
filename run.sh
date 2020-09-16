@@ -1,10 +1,11 @@
 #!/bin/bash
 
 #LAUNCH_TEMPLATE=lt-02226ebae5fbef5f3
-#LAUNCH_TEMPLATE=lt-0a6a2caec5c325268 
+#LAUNCH_TEMPLATE=lt-0a6a2caec5c325268
 #LAUNCH_TEMPLATE=lt-01e3cdbe79c78cf24
 #LAUNCH_TEMPLATE=lt-06f1433dfebcdd40e
-LAUNCH_TEMPLATE=lt-05684a162583bcf4c
+#LAUNCH_TEMPLATE=lt-05684a162583bcf4c
+LAUNCH_TEMPLATE=lt-0636829ee421ac3fe
 
 function start_instances
 {
@@ -89,11 +90,13 @@ function prepare_payload
 		IFS=',' read -r id ip lan <<< "$instance"
 		echo "Generating config files for $id"
 		mkdir -p ./payload/$id
-		cp ./scripts/bootstrap.sh ./payload/$id/bootstrap.sh
-		cp -rf ./scripts/park_agents ./payload/$id/
+		#cp ./scripts/bootstrap.sh ./payload/$id/bootstrap.sh
+		cp ./scripts/init.sh ./payload/$id/init.sh
+		cp ./scripts/start_rt.sh ./payload/$id/start_rt.sh
+		cp ./scripts/stop_rt.sh ./payload/$id/stop_rt.sh
 		# TODO: copy all the appropriate models as well
 	done
-	python3 ./scripts/gen_workload.py 
+	python3 ./gen_workload.py
 	tput setaf 2
 	echo "Payload written"
 	tput sgr0
@@ -107,17 +110,20 @@ function sync_payload_single
 function install_deps_single
 {
 	ssh $1 -- 'mkdir -p /home/ubuntu/log'
-	ssh $1 -- 'bash /home/ubuntu/payload/bootstrap.sh &>/home/ubuntu/log/deps.log'
+	#ssh $1 -- 'bash /home/ubuntu/payload/bootstrap.sh &>/home/ubuntu/log/deps.log'
+  ssh $1 -- 'bash /home/ubuntu/payload/init.sh &>/home/ubuntu/log/deps.log'
 }
 
 function start_scorex_single
 {
-	ssh $1 -- 'bash /home/ubuntu/payload/start-scorex.sh &>/home/ubuntu/log/start.log'
+	#ssh $1 -- 'bash /home/ubuntu/payload/start-scorex.sh &>/home/ubuntu/log/start.log'
+	ssh $1 -- 'bash /home/ubuntu/payload/start_rt.sh &>/home/ubuntu/log/start.log'
 }
 
 function stop_scorex_single
 {
-	ssh $1 -- 'bash /home/ubuntu/payload/stop-scorex.sh &>/home/ubuntu/log/stop.log'
+	#ssh $1 -- 'bash /home/ubuntu/payload/stop-scorex.sh &>/home/ubuntu/log/stop.log'
+	ssh $1 -- 'bash /home/ubuntu/payload/stop-rt.sh &>/home/ubuntu/log/stop.log'
 }
 
 function copy_log_files_single
@@ -125,6 +131,7 @@ function copy_log_files_single
 	# $1: host id, $2: EXP_NAME directory.
 	mkdir -p $2
 	mkdir -p $2/$1
+	ssh $1 -- 'cp -rf /home/ubuntu/payload/results /home/ubuntu/log/ &>/home/ubuntu/log/copy.log'
 	scp -r $1:/home/ubuntu/log/* ./$2/$1
 }
 
