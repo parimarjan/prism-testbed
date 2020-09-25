@@ -39,7 +39,8 @@ for pdir in payload_dirs:
         costs_fn = result_dir + "/" + alg_dir + "/" + COST_TYPE + ".pkl"
         rt_fn = result_dir + "/" + alg_dir + "/" + "runtimes_" + COST_TYPE + ".csv"
         costs = load_object(costs_fn)
-        assert os.path.exists(rt_fn)
+        if not os.path.exists(rt_fn):
+            continue
         # rts = load_object(rt_fn)
         rts = pd.read_csv(rt_fn)
         # divide it into num_payload parts

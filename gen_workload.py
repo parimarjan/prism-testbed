@@ -10,9 +10,9 @@ RESULTS_DIR = "./results/"
 PAYLOAD_DIR = "./payload/"
 ONLY_TEST = True
 ONLY_JOB = True
-ONLY_TRAIN = True
+ONLY_TRAIN = False
 TIMEOUT_CONSTANT = 909.0
-ONLY_RUNTIME_KEYS = True
+ONLY_RUNTIME_KEYS = False
 # RES_FNS = ["nested_loop_index7_jerr.pkl", "cm1_jerr.pkl"]
 RES_FNS = ["cm1_jerr.pkl"]
 
@@ -38,19 +38,19 @@ payload_dirs = os.listdir(PAYLOAD_DIR)
 
 for res_fn in RES_FNS:
     # rt_keys
-    # if res_fn == "plan_pg_err.pkl":
-        # rt_keys = list(load_object("plan_pg_err_keys.pkl"))
-    # elif res_fn == "cm1_jerr.pkl":
-        # rt_keys = list(load_object("cm1_jerr_keys.pkl"))
-    # elif res_fn == "nested_loop_index7_jerr.pkl":
-        # rt_keys = list(load_object("nested_loop_index7_jerr_keys.pkl"))
-    # else:
-        # assert False
     rt_keys = None
-
+    if res_fn == "plan_pg_err.pkl":
+        rt_keys = list(load_object("plan_pg_err_keys.pkl"))
+    elif res_fn == "cm1_jerr.pkl":
+        rt_keys = list(load_object("cm1_jerr_keys.pkl"))
+    elif res_fn == "nested_loop_index7_jerr.pkl":
+        rt_keys = list(load_object("nested_loop_index7_jerr_keys.pkl"))
+    else:
+        assert False
     for alg_dir in os.listdir(RESULTS_DIR):
         args_fn = RESULTS_DIR + "/" + alg_dir + "/" + "args.pkl"
         costs_fn = RESULTS_DIR + "/" + alg_dir + "/" + res_fn
+        print(costs_fn)
         costs = load_object(costs_fn)
         exp_args = load_object(args_fn)
         rt_fn = RESULTS_DIR + "/" + alg_dir + "/" + "runtimes_" + res_fn
