@@ -62,7 +62,7 @@ for res_fn in RES_FNS:
             rts = None
 
         if rts is not None:
-            # rts = rts[rts["runtime"] != TIMEOUT_CONSTANT]
+            rts = rts[rts["runtime"] != TIMEOUT_CONSTANT]
             exclude_keys = set(rts["sql_key"])
             len_before = len(costs)
             costs = costs[~costs["sql_key"].isin(exclude_keys)]

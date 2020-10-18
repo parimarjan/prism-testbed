@@ -103,6 +103,15 @@ function sync_payload_single
 	rsync -r payload/$1/ $1:/home/ubuntu/payload
 }
 
+function update_pghint_single
+{
+	#ssh $1 -- 'mkdir -p /home/ubuntu/log'
+	#ssh $1 -- 'bash /home/ubuntu/payload/bootstrap.sh &>/home/ubuntu/log/deps.log'
+  ssh $1 -- 'bash source ~/.bashrc'
+  ssh $1 -- 'bash source ~/.bashrc && /home/ubuntu/postgres_setup_scripts/pg_hint_update.sh &>/home/ubuntu/log/pgh.log'
+}
+
+
 function install_deps_single
 {
 	ssh $1 -- 'mkdir -p /home/ubuntu/log'
@@ -348,6 +357,8 @@ case "$1" in
 		execute_on_all sync_payload ;;
 	install-deps)
 		execute_on_all install_deps ;;
+	update-pghint)
+		execute_on_all update_pghint ;;
 	start-scorex)
 		execute_on_all start_scorex ;;
 	stop-scorex)
