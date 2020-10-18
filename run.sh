@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#LAUNCH_TEMPLATE=lt-0636829ee421ac3fe
-LAUNCH_TEMPLATE=lt-05e58a337e8784d43
+LAUNCH_TEMPLATE=lt-0636829ee421ac3fe
+#LAUNCH_TEMPLATE=lt-05e58a337e8784d43
 
 function start_instances
 {
