@@ -35,6 +35,9 @@ all_rts = defaultdict(list)
 for pdir in payload_dirs:
     print(pdir)
     result_dir = LOG_DIR + pdir + "/results"
+    if not os.path.exists(result_dir):
+        print("skipping ", pdir)
+        continue
     for alg_dir in os.listdir(result_dir):
         costs_fn = result_dir + "/" + alg_dir + "/" + COST_TYPE + ".pkl"
         rt_fn = result_dir + "/" + alg_dir + "/" + "runtimes_" + COST_TYPE + ".csv"

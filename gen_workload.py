@@ -30,8 +30,11 @@ def save_object(file_name, data):
 def load_object(file_name):
     res = None
     if os.path.exists(file_name):
+        # with open(file_name, "rb") as f:
+            # res = pickle.loads(f.read())
         with open(file_name, "rb") as f:
-            res = pickle.loads(f.read())
+            res = pickle.load(f)
+        print("loaded: ", res)
     return res
 
 payload_dirs = os.listdir(PAYLOAD_DIR)
