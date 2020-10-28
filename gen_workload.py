@@ -34,27 +34,26 @@ def load_object(file_name):
             # res = pickle.loads(f.read())
         with open(file_name, "rb") as f:
             res = pickle.load(f)
-        print("loaded: ", res)
     return res
 
 payload_dirs = os.listdir(PAYLOAD_DIR)
 
 for res_fn in RES_FNS:
     # rt_keys
-    rt_keys = None
-    # if res_fn == "plan_pg_err.pkl":
-        # rt_keys = list(load_object("plan_pg_err_keys.pkl"))
-    # elif res_fn == "cm1_jerr.pkl":
-        # rt_keys = list(load_object("cm1_jerr_keys.pkl"))
-    # elif res_fn == "nested_loop_index7_jerr.pkl":
-        # rt_keys = list(load_object("nested_loop_index7_jerr_keys.pkl"))
-    # else:
-        # assert False
+    # rt_keys = None
+    if res_fn == "plan_pg_err.pkl":
+        rt_keys = list(load_object("plan_pg_err_keys.pkl"))
+    elif res_fn == "cm1_jerr.pkl":
+        rt_keys = list(load_object("cm1_jerr_keys.pkl"))
+        print("num keys: ", len(rt_keys))
+    elif res_fn == "nested_loop_index7_jerr.pkl":
+        rt_keys = list(load_object("nested_loop_index7_jerr_keys.pkl"))
+    else:
+        assert False
 
     for alg_dir in os.listdir(RESULTS_DIR):
         args_fn = RESULTS_DIR + "/" + alg_dir + "/" + "args.pkl"
         costs_fn = RESULTS_DIR + "/" + alg_dir + "/" + res_fn
-        print(costs_fn)
         assert os.path.exists(costs_fn)
         costs = load_object(costs_fn)
         exp_args = load_object(args_fn)
