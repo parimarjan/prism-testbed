@@ -9,7 +9,7 @@ import errno
 RESULTS_DIR = "./results/"
 PAYLOAD_DIR = "./payload/"
 ONLY_TEST = True
-ONLY_JOB = True
+ONLY_JOB = False
 ONLY_TRAIN = False
 TIMEOUT_CONSTANT = 909.0
 ONLY_RUNTIME_KEYS = False
